@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import ListItem from '../../components/ListItem/ListItem'
 import Tasks from '../../components/Tasks/Tasks'
-import { updateObject } from '../../shared/utility'
+import { updateByIndex } from '../../shared/utility'
 
 export default class Lists extends Component {
     state = {
@@ -86,19 +86,12 @@ export default class Lists extends Component {
         this.setState({selectedTask: null});
     }
 
-    selectTaskItem = (index) => {
-        console.log( this.state.list);
-        const updatedList = updateObject(this.state.list, {
-            [this.state.selectedTask]: updateObject(this.state.list[this.state.selectedTask], {
-                selected: !this.state.list[this.state.selectedTask].selected
-            })
+    selectTaskItem = (selectedIndex) => {
+        const updatedTask = updateByIndex(selectedIndex, this.state.list[this.state.selectedTask].tasks,  { selected: !this.state.list[this.state.selectedTask].tasks[selectedIndex].selected });
+        const updatedList = updateByIndex(this.state.selectedTask, this.state.list,  { tasks: updatedTask });
+        this.setState({
+             list: updatedList
         });
-
-        console.log( updatedList);
-        this.setState(prevState => ({
-             list: {
-                 updatedList
-        }));
     }
 
     render() {
