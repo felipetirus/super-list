@@ -13,3 +13,8 @@ export const updateByIndex = (indexChange, list, updatedProperties) => {
             el)
     );
 }
+
+export const objectToList = (objectList) => {
+    return Object.keys(objectList)
+      .map((objectKey) => objectList[objectKey]);
+  };

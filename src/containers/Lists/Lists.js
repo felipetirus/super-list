@@ -3,6 +3,7 @@ import ListItem from '../../components/ListItem/ListItem'
 import Auxiliary from '../../hoc/Auxiliary/Auxiliary'
 import { connect } from 'react-redux'
 import * as actions from '../../store/actions'
+import {objectToList} from '../../shared/utility'
 
 class Lists extends Component {
     state = {
@@ -31,12 +32,14 @@ class Lists extends Component {
     render() {
         let content = <p>Loading...</p>;
         if (this.props.list) {
+            const arrayList = objectToList(this.props.list);
+            
             content = (
                 <Auxiliary>
                     <input type="text" onChange={this.onChangeListNameHandler} value={this.state.newItem} />
                     <button onClick={this.addNewHandler}>+</button>
-                    {   this.props.list.map((value, index)=>( 
-                            <ListItem key={index} value={value.name} clicked={() => this.selectListHandler(index)} />
+                    {   arrayList.map((listItem)=>( 
+                            <ListItem key={listItem.id} value={listItem.name} clicked={() => this.selectListHandler(listItem.id)} />
                         ))
                     }
                 </Auxiliary>

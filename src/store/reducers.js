@@ -1,5 +1,5 @@
 import * as actionTypes from './actionTypes';
-import { updateObject, updateByIndex } from '../shared/utility';
+import {updateObject} from '../shared/utility';
 
 const initialState = { 
     list: null,
@@ -21,10 +21,14 @@ const initList = (state, action) => {
 }
 
 const addList = (state, action) => {
-    const newList = state.list.concat({
+    //Temporario
+    const id = Math.floor(Math.random() * 1000) + 10;
+    const newList = {...state.list};
+    newList[id] = {
+        id: id,
         name: action.listName,
         tasks: []
-    });
+    };
     return updateObject(state, {list: newList});
 }
 
@@ -36,22 +40,27 @@ const selectList = (state, action) => {
 }
 
 const addTask = (state, action) => {
-    const addedTasksList = state.tasks.concat({
+    const newTaks = {...state.tasks};
+    const id = Math.floor(Math.random() * 1000) + 10;
+    newTaks[id] = {
+        id: id,
         name: action.taskName,
         selected: false 
-    }); 
-
-    const newList = updateByIndex(state.selectedList, state.list, {tasks: addedTasksList});  
+    }; 
+    const newList = {...state.list};
+    newList[state.selectedList].tasks = newTaks;
     return updateObject(state, {
         list: newList,
-        tasks: addedTasksList
+        tasks: newTaks
     });
 }
 
-
 const selectTask = (state, action) => {
-    const newTasks = updateByIndex(action.taskIndex, state.tasks, updateObject(state.tasks[action.taskIndex], {selected: !state.tasks[action.taskIndex].selected}));  
-     const newList = updateByIndex(state.selectedList, state.list, {tasks: newTasks});  
+    const newTasks = {...state.tasks};
+    newTasks[action.taskIndex] = updateObject(state.tasks[action.taskIndex], {selected: !state.tasks[action.taskIndex].selected});
+
+    const newList = {...state.list};
+    newList[state.selectedList].tasks = newTasks;
     return updateObject(state, {
         list: newList,
         tasks: newTasks
