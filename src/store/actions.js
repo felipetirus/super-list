@@ -1,102 +1,42 @@
-import * as actionTypes from './actionTypes';
+import * as actionTypes from './actionTypes'
+import axios from '../axios-config'
+import { uuidv4 } from '../shared/utility'
 
-export const initList = () => {
+export const initiatedList = (list) => {
     return {
         type: actionTypes.INIT_LIST,
-        
-        list: {
-            '1': {
-                id: '1',
-                name: "Groceries",
-                tasks: {
-                    '1': {
-                        id:'1',
-                        name: "Bread",
-                        selected: false 
-                    },
-                    '2':{
-                        id:'2',
-                        name: "Cheese",
-                        selected: false 
-                    },
-                    '3':{
-                        id:'3',
-                        name: "Chocolate",
-                        selected: false 
-                    }
-                }
-            },
-            '2': {
-                id: '2',
-                name: "GYM",
-                tasks: {
-                    '1':{
-                        id:'1',
-                        name: "Chest 3x10",
-                        selected: false 
-                    },
-                    '2':{
-                        id:'2',
-                        name: "Sholders 3x12",
-                        selected: false 
-                    },
-                    '3':{
-                        id:'3',
-                        name: "Legs 3x8",
-                        selected: false 
-                    }
-                }
-            },
-            '3': {
-                id: '3',
-                name: "Expenses",
-                tasks: {
-                    '1':{
-                        id:'1',
-                        name: "Hair Cut $10",
-                        selected: false 
-                    },
-                    '2':{
-                        id:'2',
-                        name: "Street food $5",
-                        selected: false 
-                    },
-                    '3':{
-                        id:'3',
-                        name: "Bus $2",
-                        selected: false 
-                    }
-                }
-            },
-            '4': {
-                id: '4',
-                name: "Others",
-                tasks: {
-                    '1':{
-                        id:'1',
-                        name: "Renew license",
-                        selected: false 
-                    },
-                    '2':{
-                        id:'2',
-                        name: "Study React",
-                        selected: false 
-                    },
-                    '3':{
-                        id:'3',
-                        name: "Study HTML/CSS",
-                        selected: false 
-                    }                    
-                }
-            }
-        }
+        list: list
+    }
+}
+
+export const initList = (listName) => {
+    return (dispatch) => {
+        axios.get('/lists.json')
+            .then(response => {
+                console.log(response.data);
+
+                dispatch(initiatedList(response.data != null? response.data: []));
+            })
+            .catch(error=> (console.log(error)));
+    }
+}
+
+const addedList = (newListItem, id) => {
+    return {
+        type: actionTypes.ADD_LIST,
+        newListItem: newListItem,
+        id: id
     }
 }
 
 export const addList = (listName) => {
-    return {
-        type: actionTypes.ADD_LIST,
-        listName: listName
+    return (dispatch) => {
+        const newListItem = {name: listName};
+        axios.post('/lists.json', newListItem)
+            .then(response => {
+                dispatch(addedList(newListItem, response.data.name));
+            })
+            .catch(error=> (console.log(error)));
     }
 }
 
@@ -108,15 +48,59 @@ export const selectList = (index) => {
 }
 
 export const addTask = (taskName) => {
+    const newTask =  {
+        name: taskName,
+        selected: false 
+    }
+
+    return (dispatch, getState) => {
+        const updatedItem = {
+            ...getState().list[getState().selectedList],
+            tasks: {
+                ...getState().list[getState().selectedList].tasks,
+                [uuidv4()]: newTask
+            }
+        };
+
+        axios.put('/lists/'+getState().selectedList+'/.json', updatedItem)
+            .then(response => {
+                dispatch(addedTask(updatedItem.tasks));
+            })
+            .catch(error=> (console.log(error)));
+    }
+}
+
+export const addedTask = (tasks) => {
     return {
         type: actionTypes.ADD_TASK,
-        taskName: taskName
+        tasks: tasks
     }
 }
 
 export const selectTask = (taskIndex) => {
+    return (dispatch, getState) => {
+        const updatedItem = {
+            ...getState().list[getState().selectedList],
+            tasks: {
+                ...getState().list[getState().selectedList].tasks,
+                [taskIndex]: {
+                    ...getState().list[getState().selectedList].tasks[taskIndex],
+                    selected: !getState().list[getState().selectedList].tasks[taskIndex].selected
+                }
+            }
+        };
+
+        axios.put('/lists/'+getState().selectedList+'/.json', updatedItem)
+            .then(response => {
+                dispatch(addedTask(updatedItem.tasks));
+            })
+            .catch(error=> (console.log(error)));
+    }
+}
+
+export const selectedTask = (tasks) => {
     return {
         type: actionTypes.SELECT_TASK,
-        taskIndex: taskIndex
+        tasks: tasks
     }
 }

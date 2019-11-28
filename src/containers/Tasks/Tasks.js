@@ -31,7 +31,8 @@ class Tasks extends Component {
     render () {
         let content = <p>Loading ...</p>;
         if (this.props.selectedList !== null) {
-            const arrayTasks = objectToList(this.props.tasks);
+            const taks = this.props.tasks != null? this.props.tasks : [];
+            const arrayTasks = objectToList(taks);
 
             content = <div>
                 <button onClick={this.toListHandler}>Back</button>

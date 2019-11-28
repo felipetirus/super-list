@@ -21,14 +21,8 @@ const initList = (state, action) => {
 }
 
 const addList = (state, action) => {
-    //Temporario
-    const id = Math.floor(Math.random() * 1000) + 10;
     const newList = {...state.list};
-    newList[id] = {
-        id: id,
-        name: action.listName,
-        tasks: []
-    };
+    newList[action.id] = action.newListItem;
     return updateObject(state, {list: newList});
 }
 
@@ -40,30 +34,20 @@ const selectList = (state, action) => {
 }
 
 const addTask = (state, action) => {
-    const newTaks = {...state.tasks};
-    const id = Math.floor(Math.random() * 1000) + 10;
-    newTaks[id] = {
-        id: id,
-        name: action.taskName,
-        selected: false 
-    }; 
     const newList = {...state.list};
-    newList[state.selectedList].tasks = newTaks;
+    newList[state.selectedList].tasks = action.tasks;
     return updateObject(state, {
         list: newList,
-        tasks: newTaks
+        tasks: action.tasks
     });
 }
 
 const selectTask = (state, action) => {
-    const newTasks = {...state.tasks};
-    newTasks[action.taskIndex] = updateObject(state.tasks[action.taskIndex], {selected: !state.tasks[action.taskIndex].selected});
-
     const newList = {...state.list};
-    newList[state.selectedList].tasks = newTasks;
+    newList[state.selectedList].tasks = action.tasks;
     return updateObject(state, {
         list: newList,
-        tasks: newTasks
+        tasks: action.tasks
     });
 }
 
