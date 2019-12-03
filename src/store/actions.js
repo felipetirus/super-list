@@ -29,6 +29,46 @@ const addedList = (newListItem, id) => {
     }
 }
 
+export const deleteList = (id) => {
+    return (dispatch) => {
+        axios.delete('/lists/'+id+'.json')
+            .then(response => {
+                dispatch(deletedList(id));
+            })
+            .catch(error=> (console.log(error)));
+    }
+}
+
+const deletedList = (id) => {
+    return {
+        type: actionTypes.DELETE_LIST,
+        id: id
+    }
+}
+
+export const updateNameList = (id, name) => {
+    return (dispatch, getState) => {
+        const updatedItem = {
+            ...getState().list[id],
+            name: name
+        };
+
+        axios.put('/lists/'+id+'/.json', updatedItem)
+            .then(response => {
+                dispatch(updatedNameList(id, name));
+            })
+            .catch(error=> (console.log(error)));
+    }
+}
+
+const updatedNameList = (id, name) => {
+    return {
+        type: actionTypes.UPDATE_NAME_LIST,
+        id: id,
+        name: name
+    }
+}
+
 export const addList = (listName) => {
     return (dispatch) => {
         const newListItem = {name: listName};

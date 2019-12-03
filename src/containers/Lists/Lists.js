@@ -4,10 +4,15 @@ import Auxiliary from '../../hoc/Auxiliary/Auxiliary'
 import { connect } from 'react-redux'
 import * as actions from '../../store/actions'
 import {objectToList} from '../../shared/utility'
+import ConfirmationModal from '../../components/Modal/ConfirmationModal/ConfirmationModal'
 
 class Lists extends Component {
     state = {
-        newItem: ""
+        newItem: "",
+        showDeleteConfirmationModal: false,
+        deleteItemId: null,
+        editElementName: null,
+        editItemId: null
     }
 
     componentDidMount() {
@@ -28,6 +33,43 @@ class Lists extends Component {
     onChangeListNameHandler = (event) => {
         this.setState({newItem: event.target.value});
     }
+    onChangeEditNameHandler = (event) => {
+        this.setState({editElementName: event.target.value});
+    } 
+
+    onEditModeHandler = (editIdItem, currentListName) => {
+        this.setState({
+            editItemId: editIdItem,
+            editElementName: currentListName
+        });
+    }
+
+    onEditItemHandler = () => {
+        this.props.onUpdateListName(this.state.editItemId, this.state.editElementName);
+        this.setState({
+            editItemId: null,
+            editElementName: null
+        })
+    }
+
+    onDeleteHandler = (deleteItemId) => {
+        this.setState({
+            showDeleteConfirmationModal: true,
+            deleteItemId: deleteItemId
+        });
+    }
+
+    onCloseModalHandler = () => {
+        this.setState({
+            showDeleteConfirmationModal: false,
+            deleteItemId: null
+        });      
+    }
+
+    onDeleteConfirmHandler = () => {
+        this.props.onDeleteList(this.state.deleteItemId);
+        this.onCloseModalHandler();
+    }
 
     render() {
         let content = <p>Loading...</p>;
@@ -36,10 +78,28 @@ class Lists extends Component {
             
             content = (
                 <Auxiliary>
+                    {this.state.showDeleteConfirmationModal? 
+                        <ConfirmationModal 
+                            message="Deseja Deletar Lista?"
+                            closeModal={this.onCloseModalHandler}
+                            confirmModal={this.onDeleteConfirmHandler}
+                            />: null}
                     <input type="text" onChange={this.onChangeListNameHandler} value={this.state.newItem} />
                     <button onClick={this.addNewHandler}>+</button>
                     {   arrayList.map((listItem)=>( 
-                            <ListItem key={listItem.id} value={listItem.name} clicked={() => this.selectListHandler(listItem.id)} />
+                            <ListItem 
+                                key={listItem.id} 
+                                value={
+                                    this.state.editItemId !== listItem.id? 
+                                    listItem.name:
+                                    this.state.editElementName
+                                } 
+                                clicked={() => this.selectListHandler(listItem.id)} 
+                                editClicked={() => this.onEditModeHandler(listItem.id, listItem.name)}
+                                deleteClicked={() => this.onDeleteHandler(listItem.id)}
+                                changeEditNameHandler={this.onChangeEditNameHandler}
+                                editElement={this.onEditItemHandler}
+                                editMode={this.state.editItemId === listItem.id} />
                         ))
                     }
                 </Auxiliary>
@@ -75,6 +135,8 @@ const mapDispatchToProps = dispatch => {
         onInitList: () => dispatch(actions.initList()),
         onAddList: (listName) => dispatch(actions.addList(listName)),
         onSelectList: (index) => dispatch(actions.selectList(index)),
+        onDeleteList: (id) => dispatch(actions.deleteList(id)),
+        onUpdateListName: (id, name) =>  dispatch(actions.updateNameList(id, name)),
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps) (Lists); 
