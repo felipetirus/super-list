@@ -39,7 +39,7 @@ const selectList = (state, action) => {
     })
 }
 
-const addTask = (state, action) => {
+const updateTask = (state, action) => {
     const newList = {...state.list};
     newList[state.selectedList].tasks = action.tasks;
     return updateObject(state, {
@@ -89,7 +89,7 @@ const reducer = (state =initialState, action) => {
         case actionTypes.SELECT_LIST: return selectList(state, action);
         case actionTypes.UPDATE_NAME_LIST: return updateNameList(state, action);
         case actionTypes.DELETE_LIST: return deleteList(state, action);
-        case actionTypes.ADD_TASK: return addTask(state, action);
+        case actionTypes.UPDATE_TASK: return updateTask(state, action);
         case actionTypes.SELECT_TASK: return selectTask(state, action);
         case actionTypes.DELETE_TASK: return deleteTask(state, action);
         default: return state;

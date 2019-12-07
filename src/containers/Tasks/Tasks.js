@@ -10,7 +10,9 @@ class Tasks extends Component {
     state = {
         newItem: "",
         showDeleteConfirmationModal: false,
-        deleteTaskId: null
+        deleteTaskId: null,
+        editTaskId: null,
+        editElementName: null
     }
 
     toListHandler = () => {
@@ -50,6 +52,25 @@ class Tasks extends Component {
         });      
     }
 
+    onEditModeHandler = (editIdTask, currentTaskName) => {
+        this.setState({
+            editTaskId: editIdTask,
+            editElementName: currentTaskName
+        });
+    }
+
+    onChangeEditNameHandler = (event) => {
+        this.setState({editElementName: event.target.value})
+    } 
+
+    onEditTaskHandler = () => {
+        this.props.onUpdateTaskName(this.state.editTaskId, this.state.editElementName);
+        this.setState({
+            editTaskId: null,
+            editElementName: null
+        })
+    }
+
     render () {
         let content = <p>Loading ...</p>;
         if (this.props.selectedList !== null) {
@@ -70,8 +91,14 @@ class Tasks extends Component {
                     <TaskItem 
                         key={task.id} 
                         value={task} 
+                        editedName={this.state.editElementName} 
                         clicked={() => this.selectTaskItemHandler(task.id)}
-                        deleteClicked={() => this.onDeleteHandler(task.id)} />
+                        deleteClicked={() => this.onDeleteHandler(task.id)}
+                        editClicked={() => this.onEditModeHandler(task.id, task.name)} 
+                        changeEditNameHandler={this.onChangeEditNameHandler}
+                        editMode={this.state.editTaskId === task.id}
+                        editElement={this.onEditTaskHandler}
+                    />
                 ))}
             </div>
         } else {
@@ -92,7 +119,8 @@ const mapDispatchToProps = dispatch => {
     return {
         onAddTask: (taskName) => dispatch(actions.addTask(taskName)),
         onSelectTask: (taskIndex) => dispatch(actions.selectTask(taskIndex)),
-        onDeleteTask: (taskIndex) => dispatch(actions.deleteTask(taskIndex))  
+        onDeleteTask: (taskIndex) => dispatch(actions.deleteTask(taskIndex)),
+        onUpdateTaskName: (taskIndex, taskName) => dispatch(actions.updateTaskName(taskIndex, taskName)),
     }
 }
 

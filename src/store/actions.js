@@ -13,8 +13,6 @@ export const initList = (listName) => {
     return (dispatch) => {
         axios.get('/lists.json')
             .then(response => {
-                console.log(response.data);
-
                 dispatch(initiatedList(response.data != null? response.data: []));
             })
             .catch(error=> (console.log(error)));
@@ -104,15 +102,33 @@ export const addTask = (taskName) => {
 
         axios.put('/lists/'+getState().selectedList+'/.json', updatedItem)
             .then(response => {
-                dispatch(addedTask(updatedItem.tasks));
+                dispatch(updatedTask(updatedItem.tasks));
             })
             .catch(error=> (console.log(error)));
     }
 }
 
-export const addedTask = (tasks) => {
+
+export const updateTaskName = (taskId, taskName) => {
+    return (dispatch, getState) => {
+        const updateTasks = {...getState().list[getState().selectedList].tasks};
+        updateTasks[taskId].name = taskName;
+        const updatedItem = {
+            ...getState().list[getState().selectedList],
+            tasks: {...updateTasks}
+        };
+
+        axios.put('/lists/'+getState().selectedList+'/.json', updatedItem)
+            .then(response => {
+                dispatch(updatedTask(updatedItem.tasks));
+            })
+            .catch(error=> (console.log(error)));
+    }
+}
+
+export const updatedTask = (tasks) => {
     return {
-        type: actionTypes.ADD_TASK,
+        type: actionTypes.UPDATE_TASK,
         tasks: tasks
     }
 }
@@ -132,7 +148,7 @@ export const selectTask = (taskIndex) => {
 
         axios.put('/lists/'+getState().selectedList+'/.json', updatedItem)
             .then(response => {
-                dispatch(addedTask(updatedItem.tasks));
+                dispatch(updatedTask(updatedItem.tasks));
             })
             .catch(error=> (console.log(error)));
     }

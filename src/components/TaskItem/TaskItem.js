@@ -20,10 +20,10 @@ export default function TaskItem(props) {
         content = (
             <Auxiliary>
                 <input 
-                    style={{width: "150px"}}
+                    style={{width: "179px"}}
                     type="text" 
                     onChange={props.changeEditNameHandler} 
-                    value={props.value.name} />
+                    value={props.editedName} />
                 <button onClick={props.editElement}>OK</button>
             </Auxiliary>
         );
