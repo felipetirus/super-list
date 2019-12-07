@@ -65,6 +65,23 @@ const updateNameList = (state, action) => {
     });
 }
 
+const deleteTask = (state, action) => {
+    const newTasks = {...state.list[state.selectedList].tasks};
+    delete newTasks[action.id];
+    const newList = {
+        ...state.list,
+        [state.selectedList]: {
+            ...state.list[state.selectedList],
+            tasks: newTasks
+        }
+    };
+    delete newList[action.id];
+    return updateObject(state, {
+        list: newList,
+        tasks: newTasks
+    });
+}
+
 const reducer = (state =initialState, action) => {
     switch(action.type) {
         case actionTypes.INIT_LIST: return initList(state, action);
@@ -74,6 +91,7 @@ const reducer = (state =initialState, action) => {
         case actionTypes.DELETE_LIST: return deleteList(state, action);
         case actionTypes.ADD_TASK: return addTask(state, action);
         case actionTypes.SELECT_TASK: return selectTask(state, action);
+        case actionTypes.DELETE_TASK: return deleteTask(state, action);
         default: return state;
     }
 }

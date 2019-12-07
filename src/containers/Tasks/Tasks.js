@@ -4,10 +4,13 @@ import {Redirect} from 'react-router-dom'
 import { connect } from 'react-redux'
 import * as actions from '../../store/actions'
 import {objectToList} from '../../shared/utility'
+import ConfirmationModal from '../../components/Modal/ConfirmationModal/ConfirmationModal'
 
 class Tasks extends Component {
     state = {
-        newItem: ""
+        newItem: "",
+        showDeleteConfirmationModal: false,
+        deleteTaskId: null
     }
 
     toListHandler = () => {
@@ -28,6 +31,25 @@ class Tasks extends Component {
         this.props.onSelectTask(selectedIndex);
     }
 
+    onDeleteHandler = (id) => {
+        this.setState({
+            showDeleteConfirmationModal: true,
+            deleteTaskId: id
+        });
+    }    
+
+    onDeleteConfirmHandler = () => {
+        this.props.onDeleteTask(this.state.deleteTaskId);
+        this.onCloseModalHandler();
+    }
+
+    onCloseModalHandler = () => {
+        this.setState({
+            showDeleteConfirmationModal: false,
+            deleteTaskId: null
+        });      
+    }
+
     render () {
         let content = <p>Loading ...</p>;
         if (this.props.selectedList !== null) {
@@ -35,6 +57,12 @@ class Tasks extends Component {
             const arrayTasks = objectToList(taks);
 
             content = <div>
+                {this.state.showDeleteConfirmationModal? 
+                        <ConfirmationModal 
+                            message="Deseja Deletar Task?"
+                            closeModal={this.onCloseModalHandler}
+                            confirmModal={this.onDeleteConfirmHandler}
+                            />: null}
                 <button onClick={this.toListHandler}>Back</button>
                 <input type="text" onChange={this.onChangeTaskNameHandler} value={this.state.newItem} />
                 <button onClick={this.addNewHandler}>+</button>
@@ -42,7 +70,8 @@ class Tasks extends Component {
                     <TaskItem 
                         key={task.id} 
                         value={task} 
-                        clicked={() => this.selectTaskItemHandler(task.id)} />
+                        clicked={() => this.selectTaskItemHandler(task.id)}
+                        deleteClicked={() => this.onDeleteHandler(task.id)} />
                 ))}
             </div>
         } else {
@@ -62,7 +91,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         onAddTask: (taskName) => dispatch(actions.addTask(taskName)),
-        onSelectTask: (taskIndex) => dispatch(actions.selectTask(taskIndex))  
+        onSelectTask: (taskIndex) => dispatch(actions.selectTask(taskIndex)),
+        onDeleteTask: (taskIndex) => dispatch(actions.deleteTask(taskIndex))  
     }
 }
 

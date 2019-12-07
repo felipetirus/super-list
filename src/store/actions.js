@@ -144,3 +144,29 @@ export const selectedTask = (tasks) => {
         tasks: tasks
     }
 }
+
+export const deleteTask = (taskIndex) => {
+    return (dispatch, getState) => {
+        let currentTasks = {...getState().list[getState().selectedList].tasks};
+        delete currentTasks[taskIndex];
+        const updatedItem = {
+            ...getState().list[getState().selectedList],
+            tasks: {
+                ...currentTasks
+            }
+        };
+
+        axios.put('/lists/'+getState().selectedList+'/.json', updatedItem)
+            .then(response => {
+                dispatch(deletedTask(taskIndex));
+            })
+            .catch(error=> (console.log(error)));
+    }
+}
+
+const deletedTask = (id) => {
+    return {
+        type: actionTypes.DELETE_TASK,
+        id: id
+    }
+}

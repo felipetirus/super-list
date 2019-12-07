@@ -57,6 +57,11 @@ class Lists extends Component {
             showDeleteConfirmationModal: true,
             deleteItemId: deleteItemId
         });
+    }    
+
+    onDeleteConfirmHandler = () => {
+        this.props.onDeleteList(this.state.deleteItemId);
+        this.onCloseModalHandler();
     }
 
     onCloseModalHandler = () => {
@@ -64,11 +69,6 @@ class Lists extends Component {
             showDeleteConfirmationModal: false,
             deleteItemId: null
         });      
-    }
-
-    onDeleteConfirmHandler = () => {
-        this.props.onDeleteList(this.state.deleteItemId);
-        this.onCloseModalHandler();
     }
 
     render() {
